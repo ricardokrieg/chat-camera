@@ -7,6 +7,8 @@ class Lobby {
   constructor() {
     this.rooms = [];
     this.users = [];
+
+    this.bots = this.createBots();
   }
 
   createRoom(user1, user2) {
@@ -55,20 +57,31 @@ class Lobby {
     console.log(`${this.lobbyUsersCount()} users in the lobby`);
     console.log(`${this.rooms.length} rooms`);
 
-    while (this.lobbyUsersCount() >= 2) {
-      console.log(`Creating Room`);
+    for (let user of this.users) {
+      try {
+        if (user.room) {
+          continue;
+        }
 
-      const [user1, user2] = chance.pickset(this.users, 2);
+        console.log(`Creating Room`);
 
-      const room = this.createRoom(user1, user2);
-      console.log(`Room: ${room.id}`);
-      console.log(`Users: ${user1.id} and ${user2.id}`);
+        const user1 = user;
 
-      user1.room = room;
-      user2.room = room;
+        const availableUsers = filter(this.users, (u) => u.id !== user.id && !u.room);
+        const user2 = chance.pickone([ ...availableUsers, ...this.bots ]);
 
-      this.notifyUser(user1, user2.id, true);
-      this.notifyUser(user2, user1.id, false);
+        const room = this.createRoom(user1, user2);
+        console.log(`Room: ${room.id}`);
+        console.log(`Users: ${user1.id} and ${user2.id}`);
+
+        user1.room = room;
+        user2.room = room;
+
+        this.notifyUser(user1, user2.id, true);
+        this.notifyUser(user2, user1.id, false);
+      } catch (err) {
+        console.error(err);
+      }
     }
   }
 
@@ -82,6 +95,10 @@ class Lobby {
 
   findUser(userId) {
     return find(this.users, (u) => u.id === userId);
+  }
+
+  createBots() {
+    return [];
   }
 }
 

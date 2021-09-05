@@ -57,7 +57,7 @@ function onConnection(ws, req) {
 }
 
 const lobby = new Lobby();
-setInterval(lobby.update.bind(lobby), 5000);
+setInterval(lobby.update.bind(lobby), 1000);
 
 const wss = new WebSocketServer({
   port: 8080,
