@@ -7,8 +7,7 @@ class Lobby {
   constructor() {
     this.rooms = [];
     this.users = [];
-
-    this.bots = this.createBots();
+    this.bots = [];
   }
 
   createRoom(user1, user2) {
@@ -20,6 +19,10 @@ class Lobby {
 
   addUser(user) {
     this.users.push(user);
+  }
+
+  addBot(bot) {
+    this.bots.push(bot);
   }
 
   removeUser(userId) {
@@ -53,6 +56,7 @@ class Lobby {
 
   update() {
     console.log(`===================================================`)
+    console.log(`${this.bots.length} bots`);
     console.log(`${this.users.length} total users`);
     console.log(`${this.lobbyUsersCount()} users in the lobby`);
     console.log(`${this.rooms.length} rooms`);
@@ -95,10 +99,6 @@ class Lobby {
 
   findUser(userId) {
     return find(this.users, (u) => u.id === userId);
-  }
-
-  createBots() {
-    return [];
   }
 }
 

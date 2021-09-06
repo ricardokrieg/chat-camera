@@ -3,6 +3,7 @@ const {isEmpty} = require('lodash');
 
 const Lobby = require('./Lobby');
 const User = require('./User');
+const Bot = require('./Bot');
 
 function onError(ws, err) {
   console.error(`onError`, err);
@@ -41,8 +42,18 @@ function onMessage(ws, rawData) {
       return;
     }
 
-    const user = new User(data.id, ws);
-    lobby.addUser(user);
+    if (data.bot) {
+      if (data.secret !== `camera-chat-bot`) {
+        console.error(`Invalid BOT secret: ${rawData}`);
+        return;
+      }
+
+      const bot = new Bot(data.id, ws);
+      lobby.addBot(bot);
+    } else {
+      const user = new User(data.id, ws);
+      lobby.addUser(user);
+    }
 
     ws.userId = data.id;
   }
@@ -57,7 +68,7 @@ function onConnection(ws, req) {
 }
 
 const lobby = new Lobby();
-setInterval(lobby.update.bind(lobby), 1000);
+setInterval(lobby.update.bind(lobby), 2000);
 
 const wss = new WebSocketServer({
   port: 8080,

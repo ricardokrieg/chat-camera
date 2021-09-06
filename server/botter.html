@@ -1,0 +1,94 @@
+<html>
+<head>
+    <title>Botter</title>
+</head>
+
+<body>
+    <button id="start">Iniciar</button>
+    <div id="bots"></div>
+
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+
+    <script>
+        $('#start').on('click', function() {
+          connectWithServer();
+        });
+
+        function createBots() {
+          for (let i = 1; i <= 2; i++) {
+            const id = 'video-' + i;
+
+            const videoElement = $('<video />', {
+              id: id,
+              src: 'res/' + id + '.mp4',
+              type: 'video/mp4',
+              controls: true,
+              style: "display: none",
+            });
+            videoElement.appendTo($('#bots'));
+
+            const video = document.getElementById(id);
+            video.play();
+            const stream = video.mozCaptureStream();
+
+            const bot = {
+              videoId: id,
+              stream: stream,
+            };
+
+            const peerConnection = new Peer();
+            peerConnection.on('open', function (id) {
+              console.log('Peer Server ID: ' + id);
+
+              bot.id = id;
+              sendData({ id: id, bot: true, secret: 'camera-chat-bot' });
+            });
+            peerConnection.on('call', function (call) {
+              console.log('Call Received');
+
+              call.answer(bot.stream);
+            });
+          }
+        }
+
+        function connectWithServer() {
+          console.log('Connecting to WebSocket Server');
+
+          window.wsConnection = new WebSocket('ws://192.168.2.8:8080');
+
+          window.wsConnection.onerror = wsOnError;
+          window.wsConnection.onclose = wsOnClose;
+          window.wsConnection.onopen = wsOnOpen;
+          window.wsConnection.onmessage = wsOnMessage;
+        }
+
+        function wsOnError(event) {
+          console.error('WebSocket Error: ' + event);
+        }
+
+        function wsOnClose(event) {
+          console.log('Closed connection to WebSocket Server');
+        }
+
+        function wsOnOpen(event) {
+          console.log('Connected to WebSocket Server');
+
+          createBots();
+        }
+
+        function wsOnMessage(event) {
+          console.log('WebSocket Message: ' + event.data);
+        }
+
+        function sendData(data) {
+          if (!window.wsConnection) {
+            return;
+          }
+
+          window.wsConnection.send(JSON.stringify(data));
+        }
+    </script>
+</body>
+</html>

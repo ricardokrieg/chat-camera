@@ -8,7 +8,6 @@ class User {
 
   reset() {
     this.room = null;
-    this.timestamp = Date.now();
 
     this.send({ type: `reset` });
   }
