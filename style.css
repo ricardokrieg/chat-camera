@@ -1,0 +1,45 @@
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.videos-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    align-self: center;
+    width: 80%;
+}
+
+.videos-container .video:first-child {
+    background: red;
+}
+
+.videos-container .video:last-child {
+    background: blue;
+}
+
+.video {
+    position: relative;
+    width: 100%;
+}
+
+.video:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+
+.video video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+

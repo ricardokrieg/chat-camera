@@ -4,6 +4,8 @@
     <title>Chat Camera</title>
 
     <meta charset="utf-8">
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -11,15 +13,13 @@
     <button id="skip">Pular</button>
     <div id="status"></div>
 
-    <div style="max-width: 80%">
-        <h2>Você:</h2>
-        <div style="background: red; padding: 10px">
-            <video autoplay id="video" style="width: 100%"></video>
+    <div class="videos-container">
+        <div class="video">
+            <video autoplay id="video"></video>
         </div>
 
-        <h2>Parceiro:</h2>
-        <div style="background: blue; padding: 10px">
-            <video autoplay id="partner-video" style="width: 100%"></video>
+        <div class="video">
+            <video autoplay id="partner-video"></video>
         </div>
     </div>
 

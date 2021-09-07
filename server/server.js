@@ -12,7 +12,9 @@ function onError(ws, err) {
 function onClose(ws) {
   console.error(`onClose`);
 
-  if (ws.userId) {
+  if (ws.botterId) {
+    lobby.removeBots(ws.botterId);
+  } else if (ws.userId) {
     try {
       lobby.removeUser(ws.userId);
     } catch (err) {
@@ -27,15 +29,27 @@ function onMessage(ws, rawData) {
   const data = JSON.parse(rawData);
 
   if (data.type === `skip`) {
-    if (!ws.userId) {
-      console.error(`Connection not registered`);
-    }
+    if (ws.botterId) {
+      try {
+        lobby.resetBot(data.id);
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      if (!ws.userId) {
+        console.error(`Connection not registered`);
+      }
 
-    try {
-      lobby.resetUser(ws.userId);
-    } catch (err) {
-      console.error(err);
+      try {
+        lobby.resetUser(ws.userId);
+      } catch (err) {
+        console.error(err);
+      }
     }
+  } else if (data.type === `botter`) {
+    console.log(`Registered Botter #${data.id}`);
+
+    ws.botterId = data.id;
   } else {
     if (isEmpty(data.id)) {
       console.error(`Invalid message: ${rawData}`);
@@ -48,7 +62,7 @@ function onMessage(ws, rawData) {
         return;
       }
 
-      const bot = new Bot(data.id, ws);
+      const bot = new Bot(data.id, data.botterId, ws);
       lobby.addBot(bot);
     } else {
       const user = new User(data.id, ws);

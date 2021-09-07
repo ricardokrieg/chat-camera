@@ -64,6 +64,7 @@ function peerOnCall(call) {
 function callOnStream(remoteStream) {
   setStatus('Conectado');
   setVideoElement('partner-video', remoteStream);
+  console.log(remoteStream);
 }
 
 function skip() {

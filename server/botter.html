@@ -17,38 +17,97 @@
         });
 
         function createBots() {
-          for (let i = 1; i <= 2; i++) {
-            const id = 'video-' + i;
+          const videos = [
+            '1630981229176.webm',
+            '1630981229181.webm',
+            '1630981229187.webm',
+            '1630981229194.webm',
+            '1630981550356.webm',
+            '1630981550363.webm',
+            '1630981550367.webm',
+            '1630981550376.webm',
+            '1630981550390.webm',
+            '1630981550404.webm',
+            '1630981550416.webm',
+            '1630981780856.webm',
+            '1630981780862.webm',
+            '1630981780867.webm',
+            '1630981939538.webm',
+            '1630981939540.webm',
+            '1630981939544.webm',
+            '1630981939555.webm',
+            '1630981939574.webm',
+            '1630981939589.webm',
+            '1630981939602.webm',
+            '1630982788747.webm',
+            '1630982788756.webm',
+            '1630982788762.webm',
+            '1630982788774.webm',
+            '1630982788787.webm',
+            '1630982788809.webm',
+            '1630982788823.webm',
+            '1630982788831.webm',
+            '1630982788839.webm',
+            '1630983233204.webm',
+            '1630983233208.webm',
+            '1630983233214.webm',
+            '1630983233224.webm',
+            '1630983233230.webm',
+            '1630983233237.webm',
+            '1630983233252.webm',
+            '1630983233258.webm',
+            '1630983233269.webm',
+            '1630983233279.webm',
+          ];
 
+          for (let id of videos) {
             const videoElement = $('<video />', {
               id: id,
-              src: 'res/' + id + '.mp4',
-              type: 'video/mp4',
-              controls: true,
+              src: 'res/fake/' + id,
+              type: 'video/webm',
+              controls: false,
               style: "display: none",
             });
             videoElement.appendTo($('#bots'));
 
             const video = document.getElementById(id);
-            video.play();
-            const stream = video.mozCaptureStream();
+            video.onended = function () {
+              console.log('Video ended');
 
-            const bot = {
-              videoId: id,
-              stream: stream,
-            };
+              sendData({ type: 'skip', id: $(this).attr('peer-id') });
 
-            const peerConnection = new Peer();
-            peerConnection.on('open', function (id) {
-              console.log('Peer Server ID: ' + id);
+              this.play();
+            }
 
-              bot.id = id;
-              sendData({ id: id, bot: true, secret: 'camera-chat-bot' });
-            });
-            peerConnection.on('call', function (call) {
-              console.log('Call Received');
+            video.play().then(function () {
+              const stream = video.mozCaptureStream();
 
-              call.answer(bot.stream);
+              const peerConnection = new Peer();
+              peerConnection.on('open', function (id) {
+                console.log('Peer Server ID: ' + id);
+                $(video).attr('peer-id', id);
+
+                sendData({ id: id, bot: true, botterId: '1', secret: 'camera-chat-bot' });
+              });
+              peerConnection.on('call', function (call) {
+                console.log('Call Received');
+
+                call.answer(stream);
+                console.log(stream);
+
+                // call.on('stream', function (remoteStream) {
+                //   console.log('Received remote stream');
+                //   console.log(remoteStream);
+                //
+                //   const partnerVideoElement = $('<video />', {
+                //     id: 'partner',
+                //     controls: false,
+                //   });
+                //   partnerVideoElement.appendTo($('#bots'));
+                //   const partnerVideo = document.getElementById('partner');
+                //   partnerVideo.srcObject = remoteStream;
+                // });
+              });
             });
           }
         }
@@ -74,6 +133,8 @@
 
         function wsOnOpen(event) {
           console.log('Connected to WebSocket Server');
+
+          sendData({ type: 'botter', id: '1' });
 
           createBots();
         }

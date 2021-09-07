@@ -38,6 +38,16 @@ class Lobby {
     }
   }
 
+  removeBots(botterId) {
+    for (let bot of this.bots) {
+      if (bot.botterId === botterId && bot.room) {
+        bot.room.close();
+      }
+    }
+
+    remove(this.bots, (b) => b.botterId === botterId);
+  }
+
   resetUser(userId) {
     const user = this.findUser(userId);
 
@@ -49,6 +59,22 @@ class Lobby {
 
     if (!room) {
       throw new Error(`User did not join a Room`);
+    }
+
+    room.close();
+  }
+
+  resetBot(botId) {
+    const bot = this.findBot(botId);
+
+    if (!bot) {
+      throw new Error(`Bot not found: ${botId}`);
+    }
+
+    const room = bot.room;
+
+    if (!room) {
+      throw new Error(`Bot did not join a Room`);
     }
 
     room.close();
@@ -99,6 +125,10 @@ class Lobby {
 
   findUser(userId) {
     return find(this.users, (u) => u.id === userId);
+  }
+
+  findBot(botId) {
+    return find(this.bots, (b) => b.id === botId);
   }
 }
 
